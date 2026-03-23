@@ -39,6 +39,8 @@ chmod +x dev-setup.sh && ./dev-setup.sh
 
 The script is **idempotent** — safe to run multiple times. It skips already-installed tools and backs up existing configs before overwriting.
 
+On macOS, the script runs with the system Bash and is compatible with the default Bash 3.2 that ships with macOS.
+
 ## Prerequisites
 
 - macOS (Apple Silicon or Intel)
@@ -50,6 +52,7 @@ The script is **idempotent** — safe to run multiple times. It skips already-in
 ### ~/.zshrc
 - Oh My Zsh with no theme (Starship handles prompt)
 - 6 plugins
+- `~/.local/bin` added to `PATH`
 - Lazy-loaded NVM
 - JDK switcher functions
 - Zoxide init
@@ -76,6 +79,7 @@ The script is **idempotent** — safe to run multiple times. It skips already-in
 - Catppuccin Mocha file icons
 - MesloLGS NF font
 - Ghostty as external terminal
+- Auto-links the `code` CLI from the installed VS Code app into `~/.local/bin/code` if VS Code is present but the CLI is missing
 
 ## Ghostty Shortcuts
 
