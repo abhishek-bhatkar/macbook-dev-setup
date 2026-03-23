@@ -89,18 +89,27 @@ step 5 "Installing Zsh plugins"
 # ─────────────────────────────────────────────────────────────────────────────
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
-declare -A PLUGINS=(
-  [zsh-autosuggestions]="https://github.com/zsh-users/zsh-autosuggestions"
-  [zsh-syntax-highlighting]="https://github.com/zsh-users/zsh-syntax-highlighting"
-  [zsh-history-substring-search]="https://github.com/zsh-users/zsh-history-substring-search"
-  [you-should-use]="https://github.com/MichaelAquilina/zsh-you-should-use"
+PLUGIN_NAMES=(
+  "zsh-autosuggestions"
+  "zsh-syntax-highlighting"
+  "zsh-history-substring-search"
+  "you-should-use"
 )
 
-for plugin in "${!PLUGINS[@]}"; do
+PLUGIN_URLS=(
+  "https://github.com/zsh-users/zsh-autosuggestions"
+  "https://github.com/zsh-users/zsh-syntax-highlighting"
+  "https://github.com/zsh-users/zsh-history-substring-search"
+  "https://github.com/MichaelAquilina/zsh-you-should-use"
+)
+
+for i in "${!PLUGIN_NAMES[@]}"; do
+  plugin="${PLUGIN_NAMES[$i]}"
+  plugin_url="${PLUGIN_URLS[$i]}"
   if [[ -d "$ZSH_CUSTOM/plugins/$plugin" ]]; then
     info "$plugin already installed"
   else
-    git clone "${PLUGINS[$plugin]}" "$ZSH_CUSTOM/plugins/$plugin"
+    git clone "$plugin_url" "$ZSH_CUSTOM/plugins/$plugin"
     info "$plugin installed"
   fi
 done
@@ -130,6 +139,9 @@ ZSH_HIGHLIGHT_MAXLENGTH=200
 
 # Language
 export LANG=en_US.UTF-8
+
+# User-local binaries
+export PATH="$HOME/.local/bin:$PATH"
 
 # ──────────────────────────────────────────────
 # JDK Switcher — usage: jdk8, jdk17, jdk19, jdks
@@ -578,9 +590,30 @@ step 9 "Configuring VS Code / Windsurf themes"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # VS Code
+CODE_BIN=""
 if command -v code &>/dev/null; then
-  code --install-extension Catppuccin.catppuccin-vsc --force 2>/dev/null || true
-  code --install-extension Catppuccin.catppuccin-vsc-icons --force 2>/dev/null || true
+  CODE_BIN="$(command -v code)"
+else
+  for VSCODE_APP in \
+    "/Applications/Visual Studio Code.app" \
+    "$HOME/Applications/Visual Studio Code.app" \
+    "/Applications/Visual Studio Code - Insiders.app" \
+    "$HOME/Applications/Visual Studio Code - Insiders.app"
+  do
+    VSCODE_CLI="$VSCODE_APP/Contents/Resources/app/bin/code"
+    if [[ -x "$VSCODE_CLI" ]]; then
+      mkdir -p "$HOME/.local/bin"
+      ln -sf "$VSCODE_CLI" "$HOME/.local/bin/code"
+      CODE_BIN="$HOME/.local/bin/code"
+      info "VS Code CLI linked to $CODE_BIN"
+      break
+    fi
+  done
+fi
+
+if [[ -n "$CODE_BIN" ]]; then
+  "$CODE_BIN" --install-extension Catppuccin.catppuccin-vsc --force 2>/dev/null || true
+  "$CODE_BIN" --install-extension Catppuccin.catppuccin-vsc-icons --force 2>/dev/null || true
 
   VSCODE_SETTINGS="$HOME/Library/Application Support/Code/User/settings.json"
   mkdir -p "$(dirname "$VSCODE_SETTINGS")"
