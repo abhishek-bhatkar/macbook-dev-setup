@@ -1,5 +1,7 @@
 # Developer Environment Setup
 
+![Homebrew](https://img.shields.io/badge/Homebrew-supported-FBB040?logo=homebrew&logoColor=white)
+
 One-click script to set up a fully customized macOS developer terminal environment.
 
 ## What's Included
