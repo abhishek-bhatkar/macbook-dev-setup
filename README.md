@@ -37,6 +37,15 @@ One-click script to set up a fully customized macOS developer terminal environme
 chmod +x dev-setup.sh && ./dev-setup.sh
 ```
 
+## Install With Homebrew
+
+```bash
+brew install --HEAD https://raw.githubusercontent.com/abhishek-bhatkar/macbook-dev-setup/main/Formula/macbook-dev-setup.rb
+macbook-dev-setup
+```
+
+This installs the script as the `macbook-dev-setup` command. The Homebrew install step only installs the command; your shell and editor configuration changes happen when you run `macbook-dev-setup`.
+
 The script is **idempotent** — safe to run multiple times. It skips already-installed tools and backs up existing configs before overwriting.
 
 On macOS, the script runs with the system Bash and is compatible with the default Bash 3.2 that ships with macOS.

@@ -5,6 +5,18 @@
 # =============================================================================
 set -e
 
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  cat <<'EOF'
+Usage: dev-setup.sh
+
+Bootstraps a macOS developer terminal environment by installing packages,
+fonts, shell plugins, and config files.
+
+This script is idempotent and safe to run multiple times.
+EOF
+  exit 0
+fi
+
 BOLD='\033[1m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
