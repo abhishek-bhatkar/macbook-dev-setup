@@ -12,7 +12,7 @@ One-click script to set up a fully customized macOS developer terminal environme
 - **Starship** — cross-shell prompt with Catppuccin Powerline preset + Azure module
 - **Zoxide** — smart `cd` replacement that learns your habits
 
-### Theme (Catppuccin Mocha everywhere)
+### Theme (Catppuccin Macchiato everywhere)
 - Ghostty terminal
 - Starship prompt
 - VS Code
@@ -30,8 +30,14 @@ One-click script to set up a fully customized macOS developer terminal environme
 
 ### Developer Tools
 - **JDK Switcher** — `jdk8`, `jdk17`, `jdk19`, `jdks` to switch Java versions
-- **Lazy-loaded NVM** — node/npm only loads when first used (~0.8s faster shell startup)
+- **NVM** — Node Version Manager
 - **MesloLGS Nerd Font** — icons in prompt and file explorers
+- **eza** — modern `ls` replacement with icons
+- **fzf** — fuzzy finder for files/history (`Ctrl+T`, `Alt+C`)
+- **fd** — fast `find` replacement (used by fzf)
+- **bat** — `cat` with syntax highlighting (used by fzf preview)
+- **yazi** — terminal file manager (press `y` to enter, `q` to exit and cd)
+- **lazygit** — git TUI (press `lg`)
 
 ## Usage
 
@@ -64,8 +70,12 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 - Oh My Zsh with no theme (Starship handles prompt)
 - 6 plugins
 - `~/.local/bin` added to `PATH`
-- Lazy-loaded NVM
+- NVM
 - JDK switcher functions
+- eza aliases (`ls`, `ll`, `lt`)
+- fzf configuration and keybindings
+- yazi wrapper function (`y`)
+- lazygit alias (`lg`)
 - Zoxide init
 - Starship init
 
@@ -75,7 +85,7 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 - Multi-line prompt with command duration
 
 ### ~/.config/ghostty/config
-- Catppuccin Mocha theme
+- Catppuccin Macchiato theme
 - MesloLGS NF font (14pt)
 - Native macOS tab bar
 - Copy on select
@@ -86,8 +96,8 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 - Quick terminal (`Ctrl+backtick`)
 
 ### VS Code / Windsurf
-- Catppuccin Mocha color theme
-- Catppuccin Mocha file icons
+- Catppuccin Macchiato color theme
+- Catppuccin Macchiato file icons
 - MesloLGS NF font
 - Ghostty as external terminal
 - Auto-links the `code` CLI from the installed VS Code app into `~/.local/bin/code` if VS Code is present but the CLI is missing
@@ -112,10 +122,16 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 | `z <partial-path>` | Smart cd (zoxide) |
 | `jdk8` / `jdk17` / `jdk19` | Switch Java version |
 | `jdks` | List installed JDKs |
+| `ls` / `ll` / `lt` | eza: list, long, tree |
+| `Ctrl+T` | fzf file finder |
+| `Alt+C` | fzf cd into directory |
+| `Ctrl+R` | fzf history search |
+| `y` | yazi file manager (cds on exit) |
+| `lg` | lazygit |
 
 ## Customization
 
-- **Switch Catppuccin flavor**: Change `catppuccin_mocha` to `catppuccin_frappe`, `catppuccin_macchiato`, or `catppuccin_latte` in `starship.toml` and matching `Catppuccin <Flavor>` in Ghostty config
+- **Switch Catppuccin flavor**: Change `catppuccin_macchiato` to `catppuccin_mocha`, `catppuccin_frappe`, or `catppuccin_latte` in `starship.toml` and matching `Catppuccin <Flavor>` in Ghostty config
 - **Add Starship modules**: Edit `~/.config/starship.toml`
 - **Add Ghostty keybinds**: Edit `~/.config/ghostty/config`
 - **Ghostty hot-reloads** on save — no restart needed
