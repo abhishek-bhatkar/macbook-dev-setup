@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # Developer Environment Setup Script
-# One-click setup for: Zsh + Oh My Zsh + Starship + Ghostty + cmux + Catppuccin
+# One-click setup for: Zsh + Oh My Zsh + Starship + Ghostty + Catppuccin
 # =============================================================================
 set -e
 
@@ -27,11 +27,11 @@ step() { echo -e "\n${BOLD}${BLUE}[$1/$TOTAL_STEPS]${NC} ${BOLD}$2${NC}"; }
 info() { echo -e "  ${GREEN}✓${NC} $1"; }
 warn() { echo -e "  ${YELLOW}⚠${NC} $1"; }
 
-TOTAL_STEPS=12
+TOTAL_STEPS=10
 
 echo -e "${BOLD}=======================================${NC}"
 echo -e "${BOLD}  Developer Environment Setup${NC}"
-echo -e "${BOLD}  Zsh + Starship + Ghostty + cmux + Catppuccin${NC}"
+echo -e "${BOLD}  Zsh + Starship + Ghostty + Catppuccin${NC}"
 echo -e "${BOLD}=======================================${NC}"
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 step 2 "Installing CLI tools"
 # ─────────────────────────────────────────────────────────────────────────────
-BREW_PACKAGES=(starship zoxide lazygit delta yazi bat fd ripgrep fzf eza)
+BREW_PACKAGES=(starship zoxide)
 for pkg in "${BREW_PACKAGES[@]}"; do
   if brew list "$pkg" &>/dev/null; then
     info "$pkg already installed"
@@ -67,15 +67,6 @@ if brew list --cask ghostty &>/dev/null 2>&1 || [[ -d "/Applications/Ghostty.app
 else
   brew install --cask ghostty
   info "Ghostty installed"
-fi
-
-# Install cmux (Ghostty-based terminal for AI coding agents)
-if brew list --cask cmux &>/dev/null 2>&1 || [[ -d "/Applications/cmux.app" ]]; then
-  info "cmux already installed"
-else
-  brew tap manaflow-ai/cmux 2>/dev/null || true
-  brew install --cask cmux
-  info "cmux installed"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -238,12 +229,6 @@ if command -v brew &>/dev/null && [[ -f "$(brew --prefix)/etc/bash_completion.d/
   autoload bashcompinit && bashcompinit
   source "$(brew --prefix)/etc/bash_completion.d/az"
 fi
-
-# ──────────────────────────────────────────────
-# TUI tool aliases and settings
-# ──────────────────────────────────────────────
-alias lg="lazygit"
-export BAT_THEME="Catppuccin Mocha"
 
 # ──────────────────────────────────────────────
 # Starship prompt + Zoxide (must be at end)
@@ -712,133 +697,7 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-step 10 "Configuring TUI tools (lazygit + yazi)"
-# ─────────────────────────────────────────────────────────────────────────────
-
-# lazygit — Catppuccin Mocha theme + delta pager
-LAZYGIT_CONFIG_DIR="$HOME/.config/lazygit"
-mkdir -p "$LAZYGIT_CONFIG_DIR"
-
-if [[ -f "$LAZYGIT_CONFIG_DIR/config.yml" ]]; then
-  info "lazygit config already exists — skipping"
-else
-  cat > "$LAZYGIT_CONFIG_DIR/config.yml" << 'LAZYGIT'
-gui:
-  showFileTree: true
-  mouseEvents: true
-  nerdFontsVersion: "3"
-
-os:
-  editPreset: 'nvim'
-
-git:
-  paging:
-    colorArg: always
-    pager: delta --paging=never --line-numbers
-
-theme:
-  activeBorderColor:
-    - '#89b4fa'
-    - bold
-  inactiveBorderColor:
-    - '#a6adc8'
-  searchingActiveBorderColor:
-    - '#f9e2af'
-  optionsTextColor:
-    - '#89b4fa'
-  selectedLineBgColor:
-    - '#313244'
-  inactiveViewSelectedLineBgColor:
-    - '#6c7086'
-  cherryPickedCommitFgColor:
-    - '#89b4fa'
-  cherryPickedCommitBgColor:
-    - '#45475a'
-  markedBaseCommitFgColor:
-    - '#89b4fa'
-  markedBaseCommitBgColor:
-    - '#f9e2af'
-  unstagedChangesColor:
-    - '#f38ba8'
-  defaultFgColor:
-    - '#cdd6f4'
-
-authorColors:
-  '*': '#b4befe'
-LAZYGIT
-  info "lazygit configured (Catppuccin Mocha + delta pager)"
-fi
-
-# yazi — Catppuccin Mocha theme + preview settings
-YAZI_CONFIG_DIR="$HOME/.config/yazi"
-mkdir -p "$YAZI_CONFIG_DIR"
-
-if [[ -f "$YAZI_CONFIG_DIR/yazi.toml" ]]; then
-  info "yazi config already exists — skipping"
-else
-  cat > "$YAZI_CONFIG_DIR/yazi.toml" << 'YAZITOML'
-[mgr]
-ratio = [1, 4, 3]
-sort_by = "alphabetical"
-sort_dir_first = true
-show_hidden = false
-
-[opener]
-edit = [
-    { run = 'nvim "$@"', desc = "nvim", block = true, for = "unix" },
-]
-
-[preview]
-wrap = "no"
-tab_size = 2
-max_width = 600
-max_height = 900
-YAZITOML
-
-  cat > "$YAZI_CONFIG_DIR/theme.toml" << 'YAZITHEME'
-[flavor]
-dark = "catppuccin-mocha"
-YAZITHEME
-
-  # Install Catppuccin Mocha flavor for yazi
-  if command -v ya &>/dev/null; then
-    ya pack -a yazi-rs/flavors:catppuccin-mocha 2>/dev/null || true
-  fi
-
-  info "yazi configured (Catppuccin Mocha + nvim opener)"
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-step 11 "Configuring git tools (delta + bat themes)"
-# ─────────────────────────────────────────────────────────────────────────────
-
-# delta — Catppuccin Mocha as git diff pager
-git config --global core.pager delta
-git config --global interactive.diffFilter "delta --color-only"
-git config --global delta.navigate true
-git config --global delta.side-by-side true
-git config --global delta.line-numbers true
-git config --global delta.syntax-theme "Catppuccin Mocha"
-info "delta configured (side-by-side + Catppuccin Mocha)"
-
-# bat — install Catppuccin Mocha syntax theme
-BAT_THEME_DIR="$(bat --config-dir 2>/dev/null)/themes"
-if [[ -n "$BAT_THEME_DIR" ]]; then
-  mkdir -p "$BAT_THEME_DIR"
-  if [[ ! -f "$BAT_THEME_DIR/Catppuccin Mocha.tmTheme" ]]; then
-    curl -sL "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme" \
-      -o "$BAT_THEME_DIR/Catppuccin Mocha.tmTheme"
-    bat cache --build 2>/dev/null
-    info "bat Catppuccin Mocha theme installed"
-  else
-    info "bat Catppuccin Mocha theme already installed"
-  fi
-else
-  warn "bat config dir not found — skipping theme"
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-step 12 "Cleaning up"
+step 10 "Cleaning up"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Remove Powerlevel10k remnants if present
@@ -855,14 +714,8 @@ echo -e "  ${BOLD}What was installed:${NC}"
 echo "  • Oh My Zsh + 6 plugins (autosuggestions, syntax-highlighting, etc.)"
 echo "  • Starship prompt (Catppuccin Powerline + Azure module)"
 echo "  • Ghostty terminal (Catppuccin Mocha + vim splits + quick terminal)"
-echo "  • cmux terminal (AI-native terminal with vertical tabs + git sidebar)"
 echo "  • MesloLGS Nerd Font"
 echo "  • Catppuccin Mocha theme for VS Code / Windsurf"
-echo "  • lazygit (TUI git client — Catppuccin Mocha + delta diffs)"
-echo "  • delta (beautiful git diffs — side-by-side + syntax highlighting)"
-echo "  • yazi (terminal file manager — Catppuccin Mocha + bat preview)"
-echo "  • bat (syntax-highlighted cat — Catppuccin Mocha theme)"
-echo "  • CLI tools: fd, ripgrep, fzf, eza"
 echo "  • Lazy-loaded NVM (faster shell startup)"
 echo "  • JDK switcher (jdk8, jdk17, jdk19, jdks)"
 echo "  • Zoxide (smart cd)"
@@ -873,9 +726,6 @@ echo "  • Cmd+D          — Split pane right"
 echo "  • Cmd+Shift+D    — Split pane down"
 echo "  • Opt+H/J/K/L    — Navigate splits"
 echo "  • Cmd+Shift+W    — Close split"
-echo "  • lg              — lazygit (review diffs, stage, commit)"
-echo "  • yazi / y        — Terminal file manager with preview"
-echo "  • bat <file>      — Syntax-highlighted file viewer"
 echo "  • z <dir>        — Smart cd (zoxide)"
 echo "  • jdk8/jdk17/19  — Switch Java version"
 echo ""
