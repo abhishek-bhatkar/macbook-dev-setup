@@ -51,7 +51,7 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 step 2 "Installing CLI tools"
 # ─────────────────────────────────────────────────────────────────────────────
-BREW_PACKAGES=(starship zoxide)
+BREW_PACKAGES=(starship zoxide eza fzf fd bat yazi lazygit)
 for pkg in "${BREW_PACKAGES[@]}"; do
   if brew list "$pkg" &>/dev/null; then
     info "$pkg already installed"
@@ -196,25 +196,26 @@ if [[ -d "/Library/sbt" ]]; then
 fi
 
 # ──────────────────────────────────────────────
-# Lazy-load NVM — only initializes when you first use node/npm/nvm/npx
+# NVM
 # ──────────────────────────────────────────────
 export NVM_DIR="$HOME/.nvm"
-if [[ -d "$NVM_DIR" ]]; then
-  lazy_load_nvm() {
-    unset -f nvm node npm npx
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-  }
-  nvm() { lazy_load_nvm && nvm "$@"; }
-  node() { lazy_load_nvm && node "$@"; }
-  npm() { lazy_load_nvm && npm "$@"; }
-  npx() { lazy_load_nvm && npx "$@"; }
-fi
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # ──────────────────────────────────────────────
 # Rancher Desktop
 # ──────────────────────────────────────────────
 [[ -d "$HOME/.rd/bin" ]] && export PATH="$HOME/.rd/bin:$PATH"
+
+# ──────────────────────────────────────────────
+# Windsurf
+# ──────────────────────────────────────────────
+[[ -d "$HOME/.codeium/windsurf/bin" ]] && export PATH="$HOME/.codeium/windsurf/bin:$PATH"
+
+# User-local env
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+
+export IDE_MCP_CACHE_TTL_SECONDS=3600
 
 # ──────────────────────────────────────────────
 # SDKMAN (must be near end of file)
@@ -235,6 +236,37 @@ fi
 # ──────────────────────────────────────────────
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
+
+# ──────────────────────────────────────────────
+# Terminal workflow
+# ──────────────────────────────────────────────
+
+# Yazi: cd to directory when you quit (press q)
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
+
+# lazygit
+alias lg="lazygit"
+
+# fzf: use fd for file finding, bat for preview
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+
+# eza: modern ls replacement
+alias ls="eza --icons --group-directories-first"
+alias ll="eza --icons --group-directories-first -la"
+alias lt="eza --icons --group-directories-first --tree --level=3"
+
+# fzf key bindings and completion
+source <(fzf --zsh)
 ZSHRC
 
 info ".zshrc configured"
@@ -243,6 +275,11 @@ info ".zshrc configured"
 step 7 "Configuring Starship (Catppuccin Powerline)"
 # ─────────────────────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.config"
+
+if [[ -f "$HOME/.config/starship.toml" ]]; then
+  cp "$HOME/.config/starship.toml" "$HOME/.config/starship.toml.backup.$(date +%Y%m%d%H%M%S)"
+  warn "Backed up existing starship.toml"
+fi
 
 cat > "$HOME/.config/starship.toml" << 'STARSHIP'
 "$schema" = 'https://starship.rs/config-schema.json'
@@ -277,7 +314,7 @@ $cmd_duration\
 $line_break\
 $character"""
 
-palette = 'catppuccin_mocha'
+palette = 'catppuccin_macchiato'
 
 [os]
 disabled = false
@@ -417,7 +454,7 @@ show_milliseconds = true
 format = " in $duration "
 style = "bg:lavender"
 disabled = false
-show_notifications = true
+show_notifications = false
 min_time_to_notify = 45000
 
 [palettes.catppuccin_mocha]
@@ -533,16 +570,21 @@ mantle = "#1e2030"
 crust = "#181926"
 STARSHIP
 
-info "Starship configured with Catppuccin Powerline + Azure module"
+info "Starship configured with Catppuccin Macchiato Powerline + Azure module"
 
 # ─────────────────────────────────────────────────────────────────────────────
 step 8 "Configuring Ghostty"
 # ─────────────────────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.config/ghostty"
 
+if [[ -f "$HOME/.config/ghostty/config" ]]; then
+  cp "$HOME/.config/ghostty/config" "$HOME/.config/ghostty/config.backup.$(date +%Y%m%d%H%M%S)"
+  warn "Backed up existing Ghostty config"
+fi
+
 cat > "$HOME/.config/ghostty/config" << 'GHOSTTY'
-# Theme — matches Starship Catppuccin Mocha palette
-theme = Catppuccin Mocha
+# Theme — matches Starship Catppuccin Macchiato palette
+theme = Catppuccin Macchiato
 
 # Font
 font-family = MesloLGS NF
@@ -571,7 +613,7 @@ window-inherit-font-size = true
 
 # Notify when a command takes longer than 30 seconds (only when unfocused)
 notify-on-command-finish = unfocused
-notify-on-command-finish-after = 30
+notify-on-command-finish-after = 30s
 
 # Split navigation — Opt+hjkl
 keybind = opt+h=goto_split:left
@@ -635,8 +677,8 @@ if [[ -n "$CODE_BIN" ]]; then
 import json
 with open('$VSCODE_SETTINGS', 'r') as f:
     s = json.load(f)
-s['workbench.colorTheme'] = 'Catppuccin Mocha'
-s['workbench.iconTheme'] = 'catppuccin-mocha'
+s['workbench.colorTheme'] = 'Catppuccin Macchiato'
+s['workbench.iconTheme'] = 'catppuccin-macchiato'
 s['editor.fontFamily'] = 'MesloLGS NF, Fira Code'
 s['editor.fontLigatures'] = True
 s['editor.fontSize'] = 14
@@ -649,8 +691,8 @@ with open('$VSCODE_SETTINGS', 'w') as f:
   else
     cat > "$VSCODE_SETTINGS" << 'VSCODE'
 {
-  "workbench.colorTheme": "Catppuccin Mocha",
-  "workbench.iconTheme": "catppuccin-mocha",
+  "workbench.colorTheme": "Catppuccin Macchiato",
+  "workbench.iconTheme": "catppuccin-macchiato",
   "editor.fontFamily": "MesloLGS NF, Fira Code",
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
@@ -681,12 +723,13 @@ if command -v windsurf &>/dev/null; then
 import json
 with open('$WINDSURF_SETTINGS', 'r') as f:
     s = json.load(f)
-s['workbench.colorTheme'] = 'Catppuccin Mocha'
-s['workbench.iconTheme'] = 'catppuccin-mocha'
+s['workbench.colorTheme'] = 'Catppuccin Macchiato'
+s['workbench.iconTheme'] = 'catppuccin-macchiato'
 s['editor.fontFamily'] = 'MesloLGS NF, Fira Code'
 s['editor.fontLigatures'] = True
 s['editor.fontSize'] = 14
 s['terminal.external.osxExec'] = 'Ghostty.app'
+s['terminal.explorerKind'] = 'external'
 with open('$WINDSURF_SETTINGS', 'w') as f:
     json.dump(s, f, indent=2)
 " 2>/dev/null
@@ -712,13 +755,15 @@ echo -e "${BOLD}${GREEN}=======================================${NC}"
 echo ""
 echo -e "  ${BOLD}What was installed:${NC}"
 echo "  • Oh My Zsh + 6 plugins (autosuggestions, syntax-highlighting, etc.)"
-echo "  • Starship prompt (Catppuccin Powerline + Azure module)"
-echo "  • Ghostty terminal (Catppuccin Mocha + vim splits + quick terminal)"
+echo "  • Starship prompt (Catppuccin Macchiato Powerline + Azure module)"
+echo "  • Ghostty terminal (Catppuccin Macchiato + vim splits + quick terminal)"
 echo "  • MesloLGS Nerd Font"
-echo "  • Catppuccin Mocha theme for VS Code / Windsurf"
-echo "  • Lazy-loaded NVM (faster shell startup)"
+echo "  • Catppuccin Macchiato theme for VS Code / Windsurf"
+echo "  • NVM (Node Version Manager)"
 echo "  • JDK switcher (jdk8, jdk17, jdk19, jdks)"
 echo "  • Zoxide (smart cd)"
+echo "  • eza (modern ls), fzf (fuzzy finder), fd, bat"
+echo "  • yazi (terminal file manager), lazygit (git TUI)"
 echo ""
 echo -e "  ${BOLD}Quick reference:${NC}"
 echo "  • Ctrl+\`        — Quick terminal (from anywhere)"
@@ -728,5 +773,10 @@ echo "  • Opt+H/J/K/L    — Navigate splits"
 echo "  • Cmd+Shift+W    — Close split"
 echo "  • z <dir>        — Smart cd (zoxide)"
 echo "  • jdk8/jdk17/19  — Switch Java version"
+echo "  • ls / ll / lt   — eza aliases (list, long, tree)"
+echo "  • Ctrl+T         — fzf file finder"
+echo "  • Alt+C          — fzf cd into directory"
+echo "  • y              — yazi file manager (cds on exit)"
+echo "  • lg             — lazygit"
 echo ""
 echo -e "  ${YELLOW}Open a new terminal window to see changes.${NC}"
