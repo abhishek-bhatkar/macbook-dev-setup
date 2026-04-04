@@ -8,15 +8,19 @@ One-click script to set up a fully customized macOS developer terminal environme
 
 ### Terminal & Shell
 - **Ghostty** — GPU-accelerated terminal (Zig) with native macOS tabs, split panes, quick terminal
+- **cmux** — AI-native terminal (built on Ghostty) with vertical tabs, git branch sidebar, and socket API for coding agents
 - **Zsh + Oh My Zsh** — shell framework with 6 plugins
 - **Starship** — cross-shell prompt with Catppuccin Powerline preset + Azure module
 - **Zoxide** — smart `cd` replacement that learns your habits
 
-### Theme (Catppuccin Macchiato everywhere)
-- Ghostty terminal
-- Starship prompt
-- VS Code
-- Windsurf
+### Theme (Catppuccin everywhere)
+- Ghostty terminal (Macchiato)
+- Starship prompt (Macchiato)
+- VS Code / Windsurf (Macchiato)
+- lazygit (Mocha)
+- yazi (Mocha)
+- bat (Mocha)
+- delta (Mocha)
 
 ### Zsh Plugins
 | Plugin | What it does |
@@ -28,16 +32,22 @@ One-click script to set up a fully customized macOS developer terminal environme
 | `you-should-use` | Reminds you when an alias exists for a command |
 | `web-search` | Search Google/DuckDuckGo from terminal |
 
+### Git & Diff Tools
+- **lazygit** — full git TUI with Catppuccin Mocha theme, delta as diff pager, nvim as editor (`lg`)
+- **delta** — beautiful git diff pager with side-by-side diffs, line numbers, syntax highlighting
+- **ripgrep** — fast code search (`rg`)
+
+### File Management
+- **yazi** — terminal file manager with Catppuccin Mocha theme, bat-powered preview, nvim opener (`y`)
+- **bat** — `cat` with syntax highlighting and Catppuccin Mocha theme
+- **eza** — modern `ls` replacement with icons
+- **fd** — fast `find` replacement (used by fzf)
+- **fzf** — fuzzy finder for files/history (`Ctrl+T`, `Alt+C`)
+
 ### Developer Tools
 - **JDK Switcher** — `jdk8`, `jdk17`, `jdk19`, `jdks` to switch Java versions
 - **NVM** — Node Version Manager
 - **MesloLGS Nerd Font** — icons in prompt and file explorers
-- **eza** — modern `ls` replacement with icons
-- **fzf** — fuzzy finder for files/history (`Ctrl+T`, `Alt+C`)
-- **fd** — fast `find` replacement (used by fzf)
-- **bat** — `cat` with syntax highlighting (used by fzf preview)
-- **yazi** — terminal file manager (press `y` to enter, `q` to exit and cd)
-- **lazygit** — git TUI (press `lg`)
 
 ## Usage
 
@@ -76,6 +86,7 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 - fzf configuration and keybindings
 - yazi wrapper function (`y`)
 - lazygit alias (`lg`)
+- `BAT_THEME` set to Catppuccin Mocha
 - Zoxide init
 - Starship init
 
@@ -94,6 +105,29 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 - Long command notifications (>30s)
 - Vim-style split navigation (`Opt+hjkl`)
 - Quick terminal (`Ctrl+backtick`)
+
+### ~/.config/lazygit/config.yml
+- Catppuccin Mocha theme (blue accent)
+- Delta as diff pager (`delta --paging=never --line-numbers`)
+- Nerd Fonts v3 icons
+- Nvim as edit preset
+- Mouse events + file tree view
+
+### ~/.config/yazi/yazi.toml + theme.toml
+- Catppuccin Mocha flavor
+- Nvim as default opener
+- Preview ratio `[1, 4, 3]`
+- Alphabetical sort, directories first
+
+### ~/.gitconfig (delta)
+- `core.pager = delta`
+- Side-by-side diffs with line numbers
+- Catppuccin Mocha syntax theme
+- Navigate mode enabled
+
+### bat
+- Catppuccin Mocha `.tmTheme` installed to `~/.config/bat/themes/`
+- `BAT_THEME` env var set in `.zshrc`
 
 ### VS Code / Windsurf
 - Catppuccin Macchiato color theme
@@ -127,7 +161,10 @@ On macOS, the script runs with the system Bash and is compatible with the defaul
 | `Alt+C` | fzf cd into directory |
 | `Ctrl+R` | fzf history search |
 | `y` | yazi file manager (cds on exit) |
-| `lg` | lazygit |
+| `lg` | lazygit (Catppuccin Mocha + delta diffs) |
+| `bat <file>` | Syntax-highlighted file viewer |
+| `git diff` | Side-by-side diffs via delta |
+| `rg <pattern>` | Fast code search via ripgrep |
 
 ## Customization
 
